@@ -4,3 +4,7 @@
 /.esphome/
 /secrets.yaml
 /trash/
+__pycache__/
+components/delumo/__pycache__/
+components/delumo/output/__pycache__/
+output/__pycache__/
