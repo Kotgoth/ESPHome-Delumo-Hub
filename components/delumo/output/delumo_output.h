@@ -148,7 +148,7 @@ class DelumoOutput : public Component {
 #endif
   void setup() override;
   void dump_config() override;
-  float get_setup_priority() const override { return setup_priority::BUS; }
+  float get_setup_priority() const override { return setup_priority::DATA; }
 
   void turn_on(uint16_t serial);
   void turn_off(uint16_t serial);
@@ -186,7 +186,7 @@ class DelumoOutput : public Component {
 
   int data_rate_;
   uint8_t mode_ = 0;
-  spi_device_handle_t spi_;
+  // spi_device_handle_t spi_;
 };
 
 }  // namespace delumo

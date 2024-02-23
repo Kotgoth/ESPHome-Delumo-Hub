@@ -13,6 +13,8 @@ volatile bool receive_enabled = true;
 
 static const char *const TAG = "spi.delumo";
 
+spi_device_handle_t spi;
+
 #ifdef READ_ENABLED
 void DelumoOutput::update() {
   if (this->read_message_() == 1) {
@@ -33,17 +35,17 @@ void DelumoOutput::turn_off(uint16_t serial) {
 }
 
 void DelumoOutput::dump_config() {
-  ESP_LOGCONFIG(TAG, "SPIDevice");
-  LOG_PIN("  CS pin: ", this->cs_pin_);
-  ESP_LOGCONFIG(TAG, "  Mode: %d", this->mode_);
-  if (this->data_rate_ < 1000000) {
-    ESP_LOGCONFIG(TAG, "  Data rate: %dkHz", this->data_rate_ / 1000);
-  } else {
-    ESP_LOGCONFIG(TAG, "  Data rate: %dMHz", this->data_rate_ / 1000000);
-  }
-  ESP_LOGCONFIG(TAG, "Delumo GPIO:");
-  LOG_PIN("  FSEL Pin: ", this->fsel_pin_);
-  LOG_PIN("  RESET Pin: ", this->reset_pin_);
+  // ESP_LOGCONFIG(TAG, "SPIDevice");
+  // LOG_PIN("  CS pin: ", this->cs_pin_);
+  // ESP_LOGCONFIG(TAG, "  Mode: %d", this->mode_);
+  // if (this->data_rate_ < 1000000) {
+  //   ESP_LOGCONFIG(TAG, "  Data rate: %dkHz", this->data_rate_ / 1000);
+  // } else {
+  //   ESP_LOGCONFIG(TAG, "  Data rate: %dMHz", this->data_rate_ / 1000000);
+  // }
+  // ESP_LOGCONFIG(TAG, "Delumo GPIO:");
+  // LOG_PIN("  FSEL Pin: ", this->fsel_pin_);
+  // LOG_PIN("  RESET Pin: ", this->reset_pin_);
 }
 
 void DelumoOutput::reset_() {
@@ -51,6 +53,15 @@ void DelumoOutput::reset_() {
   ets_delay_us(10);
   this->reset_pin_->digital_write(true);
   ets_delay_us(300);
+}
+
+void spi_pre_transfer_callback(spi_transaction_t *t) {
+  int fdata = (int) t->user;
+  // gpio_set_level(MRF_FDATA_Pin, fdata);
+}
+
+void spi_post_transfer_callback(spi_transaction_t *t) {
+  // gpio_set_level(MRF_FDATA_Pin, FDATA_WRITE);
 }
 
 void DelumoOutput::setup_mrf_() {
@@ -93,22 +104,32 @@ void DelumoOutput::setup() {
   // this->spi_setup();
   ESP_LOGCONFIG(TAG, "SPIDevice started!");
 
-  // this->cs_pin_->setup();
-
-  // this->cs_pin_->digital_write(true);
-  // this->fsel_pin_->digital_write(true);
-
-  // vTaskDe(10);
-
   ESP_LOGI(TAG, "[APP] Startup..");
   ESP_LOGI(TAG, "[APP] IDF version: %s", esp_get_idf_version());
-  esp_log_level_set("*", ESP_LOG_INFO);
-  esp_log_level_set("mqtt_client", ESP_LOG_VERBOSE);
-  esp_log_level_set("MQTT_EXAMPLE", ESP_LOG_VERBOSE);
-  esp_log_level_set("TRANSPORT_BASE", ESP_LOG_VERBOSE);
-  esp_log_level_set("esp-tls", ESP_LOG_VERBOSE);
-  esp_log_level_set("TRANSPORT", ESP_LOG_VERBOSE);
-  esp_log_level_set("outbox", ESP_LOG_VERBOSE);
+  // esp_log_level_set("*", ESP_LOG_INFO);
+  // esp_log_level_set("mqtt_client", ESP_LOG_VERBOSE);
+  // esp_log_level_set("MQTT_EXAMPLE", ESP_LOG_VERBOSE);
+  // esp_log_level_set("TRANSPORT_BASE", ESP_LOG_VERBOSE);
+  // esp_log_level_set("esp-tls", ESP_LOG_VERBOSE);
+  // esp_log_level_set("TRANSPORT", ESP_LOG_VERBOSE);
+  // esp_log_level_set("outbox", ESP_LOG_VERBOSE);
+
+  // Initialize GPIO
+  this->fsel_pin_->setup();
+  this->reset_pin_->setup();
+  this->cs_pin_->setup();
+  this->mosi_pin_->setup();
+  this->miso_pin_->setup();
+  this->sclk_pin_->setup();
+
+  this->fsel_pin_->digital_write(true);
+  this->reset_pin_->digital_write(false);
+  this->cs_pin_->digital_write(true);
+  this->mosi_pin_->digital_write(true);
+  this->miso_pin_->digital_write(true);
+  this->sclk_pin_->digital_write(false);
+
+  this->reset_pin_->digital_write(true);
 
   // Initialize the SPI bus
   esp_err_t ret;
@@ -118,28 +139,29 @@ void DelumoOutput::setup() {
                              .quadwp_io_num = -1,
                              .quadhd_io_num = -1,
                              .max_transfer_sz = 0};
+
   spi_device_interface_config_t devcfg = {
-      .mode = mode_,                 // SPI mode 0
-      .clock_speed_hz = data_rate_,  // Clock in KHz
-      .spics_io_num = -1,            // PIN_NUM_CS,               //CS pin
-      .queue_size = 1,               // We want to be able to queue 7 transactions at a time
-      // .pre_cb = spi_pre_transfer_callback,  // Specify pre-transfer callback to handle D/C line
-      // .post_cb = spi_post_transfer_callback,
+      .mode = mode_,                        // SPI mode 0
+      .clock_speed_hz = data_rate_,         // Clock in KHz
+      .spics_io_num = -1,                   // PIN_NUM_CS,               //CS pin
+      .queue_size = 1,                      // We want to be able to queue 7 transactions at a time
+      .pre_cb = spi_pre_transfer_callback,  // Specify pre-transfer callback to handle D/C line
+      .post_cb = spi_post_transfer_callback,
       //.input_delay_ns = 30,
   };
-  ret = spi_bus_initialize(VSPI_HOST, &buscfg, SPI_DMA_CH_AUTO);
+  ESP_LOGI(TAG, "SPI bus initialize");
+  ret = spi_bus_initialize(SPI3_HOST, &buscfg, SPI_DMA_CH_AUTO);
   ESP_ERROR_CHECK(ret);
 
-  ret = spi_bus_add_device(VSPI_HOST, &devcfg, &spi_);
+  ESP_LOGI(TAG, "SPI bus add device");
+  ret = spi_bus_add_device(VSPI_HOST, &devcfg, &spi);
   ESP_ERROR_CHECK(ret);
-
-  this->fsel_pin_->setup();
-  this->reset_pin_->setup();
-  this->cs_pin_->setup();
 
   reset_();
+  ESP_LOGI(TAG, "Setup MRF");
   setup_mrf_();
   MRF_DELAY;
+  ESP_LOGI(TAG, "Setup receive");
   setup_receive_();
 }
 
@@ -214,44 +236,43 @@ void DelumoOutput::send_data_(uint8_t *data, uint8_t length) {
 }
 
 void DelumoOutput::send_byte_(uint8_t byte) {
-  // this->delegate_->transfer(byte);
-  esp_err_t ret;
-  spi_transaction_t t;
+  // esp_err_t ret;
+  // spi_transaction_t t;
 
-  memset(&t, 0, sizeof(t));       // Zero out the transaction
-  t.length = 8;                   // Command is 8 bits
-  t.tx_buffer = &byte;            // The data is the cmd itself
-  t.user = (void *) FDATA_WRITE;  // FDATA kept high
-  // if (keep_cs) t.flags = SPI_TRANS_CS_KEEP_ACTIVE;
+  // memset(&t, 0, sizeof(t));       // Zero out the transaction
+  // t.length = 8;                   // Command is 8 bits
+  // t.tx_buffer = &byte;            // The data is the cmd itself
+  // t.user = (void *) FDATA_WRITE;  // FDATA kept high
+  //                                 // if (keep_cs) t.flags = SPI_TRANS_CS_KEEP_ACTIVE;
 
-  while (miso_pin_->digital_read() == 0)
-    ;
-  // MRF reports READY by high MISO
+  // // while (miso_pin_->digital_read() == 0)
+  // ;
+  // // MRF reports READY by high MISO
 
-  ret = spi_device_polling_transmit(spi_, &t);  // Transmit!
-  assert(ret == ESP_OK);                        // Should have had no issues
+  // ret = spi_device_polling_transmit(spi_, &t);  // Transmit!
+  // assert(ret == ESP_OK);                        // Should have had no issues
 }
 
 void DelumoOutput::send_command_(uint16_t command) {
-  esp_err_t ret;
-  spi_transaction_t t;
+  // esp_err_t ret;
+  // spi_transaction_t t;
 
-  // swapping lower and higher bytes to transfer at once reg bits for MRF49XA
-  uint16_t a = ((command & 0xFF00) >> 8);
-  uint16_t b = ((command & 0x00FF) << 8);
-  command = a | b;
-  memset(&t, 0, sizeof(t));  // Zero out the transaction
-  t.length = 16;             // Command is 8 bits
-  t.tx_buffer = &command;    // The data is the cmd itself
+  // // swapping lower and higher bytes to transfer at once reg bits for MRF49XA
+  // uint16_t a = ((command & 0xFF00) >> 8);
+  // uint16_t b = ((command & 0x00FF) << 8);
+  // command = a | b;
+  // memset(&t, 0, sizeof(t));  // Zero out the transaction
+  // t.length = 16;             // Command is 8 bits
+  // t.tx_buffer = &command;    // The data is the cmd itself
 
-  while (miso_pin_->digital_read() == 0)
-    ;
-  // MRF reports READY by high MISO
+  // // while (miso_pin_->digital_read() == 0)
+  // ;
+  // // MRF reports READY by high MISO
 
-  this->cs_pin_->digital_write(false);
-  ret = spi_device_polling_transmit(spi_, &t);  // Transmit!
-  assert(ret == ESP_OK);                        // Should have had no issues.
-  this->cs_pin_->digital_write(true);
+  // this->cs_pin_->digital_write(false);
+  // ret = spi_device_polling_transmit(spi_, &t);  // Transmit!
+  // assert(ret == ESP_OK);                        // Should have had no issues.
+  // this->cs_pin_->digital_write(true);
 }
 
 // returns 1 if 6 bytes are received

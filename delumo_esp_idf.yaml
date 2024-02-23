@@ -12,9 +12,9 @@ external_components:
       type: local
       path: components
 
-# Enable logging
 logger:
-  level: INFO
+  level: DEBUG
+
 # Enable Home Assistant API
 api:
   password: ""
