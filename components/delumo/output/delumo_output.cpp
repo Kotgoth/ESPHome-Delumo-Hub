@@ -194,7 +194,7 @@ void DelumoOutput::send_byte_(uint8_t byte) {
   //   // wait for HIGH level: // MRF reports READY by high MISO
   // };
   this->delegate_->transfer(byte);
-  ets_delay_us(2600);
+  ets_delay_us(3400);
 }
 
 void DelumoOutput::send_command_(uint16_t command) {
