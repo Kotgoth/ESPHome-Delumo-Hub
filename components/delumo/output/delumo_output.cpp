@@ -190,14 +190,14 @@ void DelumoOutput::send_data_(uint8_t *data, uint8_t length) {
 }
 
 void DelumoOutput::send_byte_(uint8_t byte) {
-  while ((gpio_get_level(GPIO_NUM_19) == 0)) {
+  while ((gpio_get_level(GPIO_NUM_25) == 0)) {
     // wait for HIGH level: // MRF reports READY by high MISO
   };
   this->delegate_->transfer(byte);
 }
 
 void DelumoOutput::send_command_(uint16_t command) {
-  while (gpio_get_level(GPIO_NUM_19) == 0) {
+  while (gpio_get_level(GPIO_NUM_25) == 0) {
     // wait for HIGH level: // MRF reports READY by high MISO
   };
 
