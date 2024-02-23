@@ -209,7 +209,7 @@ void DelumoOutput::send_command_(uint16_t command) {
 
   this->cs_->digital_write(true);
 
-  ets_delay_us(10);
+  ets_delay_us(1000);
 }
 
 // returns 1 if 6 bytes are received
