@@ -118,8 +118,8 @@
 
 #define DELUMO_ID 0x6520
 #define MRF_DELAY_US 10
-#define READ_ENABLED 1
-// #define USE_FSEL_DATA
+// #define READ_ENABLED 1
+//  #define USE_FSEL_DATA
 namespace esphome {
 namespace delumo {
 
