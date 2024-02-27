@@ -4,3 +4,4 @@
 /.esphome/
 /secrets.yaml
 /trash/
+components/delumo/__pycache__/__init__.cpython-312.pyc
