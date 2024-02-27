@@ -111,20 +111,21 @@
 #define PLLCREG_CBTC (3U << 5)      // Clock Buffer Time Control
 #define PLLCREG_CBTC_5 (0b11 << 5)  // 5-10Mhz
 
-#define MRF_DELAY ets_delay_us(50);
+#define COMMAND_DELAY ets_delay_us(50);
+#define DATA_DELAY ets_delay_us(3500);
 
 #define FDATA_READ 0
 #define FDATA_WRITE 1
 
 #define DELUMO_ID 0x6520
-// #define MRF_DELAY_US 10
-//  #define READ_ENABLED 1
+#define READ_ENABLED 1
 //   #define USE_FSEL_DATA
 
 #include "esphome/core/component.h"
 #include "driver/spi_master.h"
 #include "esphome/core/hal.h"
 #include "esphome/core/log.h"
+#include <driver/gpio.h>
 
 namespace esphome {
 namespace delumo {
@@ -153,12 +154,19 @@ class DelumoOutput : public Component {
   void turn_on(uint16_t serial);
   void turn_off(uint16_t serial);
 
-  void set_reset_pin(GPIOPin *pin) { reset_pin_ = pin; }
-  void set_fsel_pin(GPIOPin *pin) { fsel_pin_ = pin; }
-  void set_mosi_pin(GPIOPin *pin) { mosi_pin_ = pin; }
-  void set_miso_pin(GPIOPin *pin) { miso_pin_ = pin; }
-  void set_cs_pin(GPIOPin *pin) { cs_pin_ = pin; }
-  void set_sclk_pin(GPIOPin *pin) { sclk_pin_ = pin; }
+  void set_reset_pin(GPIOPin *pin) { reset_pin_ = (gpio_num_t) ((InternalGPIOPin *) pin)->get_pin(); }
+  void set_fsel_pin(GPIOPin *pin) { fsel_pin_ = (gpio_num_t) ((InternalGPIOPin *) pin)->get_pin(); }
+  void set_mosi_pin(GPIOPin *pin) { mosi_pin_ = (gpio_num_t) ((InternalGPIOPin *) pin)->get_pin(); }
+  void set_miso_pin(GPIOPin *pin) { miso_pin_ = (gpio_num_t) ((InternalGPIOPin *) pin)->get_pin(); }
+  void set_cs_pin(GPIOPin *pin) { cs_pin_ = (gpio_num_t) ((InternalGPIOPin *) pin)->get_pin(); }
+  void set_sclk_pin(GPIOPin *pin) { sclk_pin_ = (gpio_num_t) ((InternalGPIOPin *) pin)->get_pin(); }
+
+  // void set_reset_pin(GPIOPin *pin) { reset_pin_ = pin; }
+  // void set_fsel_pin(GPIOPin *pin) { fsel_pin_ = pin; }
+  // void set_mosi_pin(GPIOPin *pin) { mosi_pin_ = pin; }
+  // void set_miso_pin(GPIOPin *pin) { miso_pin_ = pin; }
+  // void set_cs_pin(GPIOPin *pin) { cs_pin_ = pin; }
+  // void set_sclk_pin(GPIOPin *pin) { sclk_pin_ = pin; }
 
  protected:
   void send_package_(uint16_t id, uint16_t serial, uint8_t command);
@@ -177,16 +185,16 @@ class DelumoOutput : public Component {
   uint8_t byte_number_ = 0;
   uint8_t read_buffer_[6] = {0, 0, 0, 0, 0, 0};
 
-  GPIOPin *reset_pin_;
-  GPIOPin *fsel_pin_;
-  GPIOPin *miso_pin_;
-  GPIOPin *mosi_pin_;
-  GPIOPin *cs_pin_;
-  GPIOPin *sclk_pin_;
+  gpio_num_t reset_pin_;
+  gpio_num_t fsel_pin_;
+  gpio_num_t miso_pin_;
+  gpio_num_t mosi_pin_;
+  gpio_num_t cs_pin_;
+  gpio_num_t sclk_pin_;
 
-  int data_rate_;
+  int data_rate_ = 200000;
   uint8_t mode_ = 0;
-  // spi_device_handle_t spi_;
+  spi_device_handle_t spi_;
 };
 
 }  // namespace delumo
