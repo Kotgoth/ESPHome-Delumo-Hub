@@ -12,9 +12,9 @@ external_components:
       type: local
       path: components
 
-# Enable logging
 logger:
-  level: INFO
+  level: DEBUG
+
 # Enable Home Assistant API
 api:
   password: ""
@@ -40,17 +40,78 @@ light:
     serial: 0x0850
     output: delumo_spi
 
-spi:
-  mosi_pin: GPIO23
-  miso_pin: GPIO19
-  clk_pin: GPIO18
-  # id: spi_1
-  # interface: spi3
+  - platform: delumo
+    name: "hall_main"
+    serial: 0x0851
+    output: delumo_spi
+
+  #ПРИХОЖАЯ
+  - platform: delumo
+    name: "entrance"
+    serial: 0x086A
+    output: delumo_spi
+
+  #ВАННАЯ
+  - platform: delumo
+    name: "bathroom_aux"
+    serial: 0x085B
+    output: delumo_spi
+
+  - platform: delumo
+    name: "bathroom_main"
+    serial: 0x085A
+    output: delumo_spi
+
+  #КУХНЯ
+  - platform: delumo
+    name: "kitchen_main"
+    serial: 0x0854
+    output: delumo_spi
+
+  - platform: delumo
+    name: "kitchen_aux"
+    serial: 0x0853
+    output: delumo_spi
+
+  - platform: delumo
+    name: "kitchen_work"
+    serial: 0x08D9
+    output: delumo_spi
+
+  #КЛАДОВКА
+  - platform: delumo
+    name: "closet"
+    serial: 0x08D8
+    output: delumo_spi
+
+  #ДЕТСКАЯ
+  - platform: delumo
+    name: "kidsroom_main"
+    serial: 0x0856
+    output: delumo_spi
+
+  - platform: delumo
+    name: "kidsroom_aux"
+    serial: 0x0857
+    output: delumo_spi
+
+  #СПАЛЬНЯ
+  - platform: delumo
+    name: "bedroom_main"
+    serial: 0x0858
+    output: delumo_spi
+
+  - platform: delumo
+    name: "bedroom_aux"
+    serial: 0x0859
+    output: delumo_spi
 
 output:
   - platform: delumo
-    cs_pin: GPIO5 #maybe 22
-    fsel_pin: GPIO17
-    reset_pin: GPIO21
     id: delumo_spi
-    # spi_id: spi_1
+    cs_pin: GPIO5
+    fsel_pin: GPIO21 #17
+    reset_pin: GPIO17 #21
+    mosi_pin: GPIO23
+    miso_pin: GPIO19
+    clk_pin: GPIO18
