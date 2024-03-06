@@ -136,9 +136,9 @@ void DelumoOutput::setup() {
 
   // Initialize the SPI bus
   esp_err_t ret;
-  spi_bus_config_t buscfg = {.mosi_io_num = 23,  //((InternalGPIOPin *) mosi_pin_)->get_pin(),
-                             .miso_io_num = 19,  //((InternalGPIOPin *) miso_pin_)->get_pin(),
-                             .sclk_io_num = 18,  //((InternalGPIOPin *) sclk_pin_)->get_pin(),
+  spi_bus_config_t buscfg = {.mosi_io_num = mosi_pin_,  //((InternalGPIOPin *) mosi_pin_)->get_pin(),
+                             .miso_io_num = 19,         //((InternalGPIOPin *) miso_pin_)->get_pin(),
+                             .sclk_io_num = 18,         //((InternalGPIOPin *) sclk_pin_)->get_pin(),
                              .quadwp_io_num = -1,
                              .quadhd_io_num = -1,
                              .max_transfer_sz = 0};
