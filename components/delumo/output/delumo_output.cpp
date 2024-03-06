@@ -145,7 +145,7 @@ void DelumoOutput::setup() {
 
   spi_device_interface_config_t devcfg = {
       .mode = mode_,              // SPI mode 0
-      .clock_speed_hz = 2000000,  // Clock in Hz
+      .clock_speed_hz = 1000000,  // Clock in Hz
       .spics_io_num = -1,         // PIN_NUM_CS,               //CS pin
       .queue_size = 1,            // We want to be able to queue 7 transactions at a time
       // .pre_cb = spi_pre_transfer_callback,  // Specify pre-transfer callback to handle D/C line
