@@ -111,8 +111,8 @@
 #define PLLCREG_CBTC (3U << 5)      // Clock Buffer Time Control
 #define PLLCREG_CBTC_5 (0b11 << 5)  // 5-10Mhz
 
-#define COMMAND_DELAY ets_delay_us(50);
-#define DATA_DELAY ets_delay_us(3500);
+#define COMMAND_DELAY ets_delay_us(60);  // 50
+#define DATA_DELAY ets_delay_us(3600);   // 3500
 
 #define FDATA_READ 0
 #define FDATA_WRITE 1
