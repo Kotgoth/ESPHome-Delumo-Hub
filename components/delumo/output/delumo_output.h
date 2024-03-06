@@ -120,7 +120,7 @@
 #define DELUMO_ID 0x6520
 // #define READ_ENABLED 1
 // #define USE_FSEL_DATA
-#define USE_MISO_READY 1
+// #define USE_MISO_READY 1
 
 #include "esphome/core/component.h"
 #include "driver/spi_master.h"

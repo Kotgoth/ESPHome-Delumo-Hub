@@ -174,13 +174,13 @@ void DelumoOutput::setup_transmit_() {
 
   // SET TRANSMITTER MODE
   send_command_(PMCREG | PMCREG_TXCEN | PMCREG_SYNEN | PMCREG_OSCEN | PMCREG_LBDEN | PMCREG_CLKOEN);
-  // reset_fifo_();
+  reset_fifo_();
 }
 
 void DelumoOutput::setup_receive_() {
   //  SET RECEIVER MODE
   send_command_(PMCREG | PMCREG_RXCEN | PMCREG_BBCEN | PMCREG_SYNEN | PMCREG_OSCEN | PMCREG_LBDEN | PMCREG_CLKOEN);
-  // ets_delay_us(100);
+  ets_delay_us(100);
 
   reset_fifo_();
 
@@ -191,7 +191,7 @@ void DelumoOutput::reset_fifo_() {
   // RESET FIFO BUFFER
   send_command_(FIFOSTREG | FIFOSTREG_FFBC_8 | FIFOSTREG_DRSTM);
   send_command_(FIFOSTREG | FIFOSTREG_FFBC_8 | FIFOSTREG_FSCF | FIFOSTREG_DRSTM);
-  // ets_delay_us(10);
+  ets_delay_us(10);
 }
 
 void DelumoOutput::send_package_(uint16_t id, uint16_t serial, uint8_t command) {
