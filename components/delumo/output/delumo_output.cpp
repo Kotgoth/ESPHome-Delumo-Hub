@@ -248,9 +248,9 @@ void DelumoOutput::send_byte_(uint8_t byte) {
                                                 // if (keep_cs) t.flags = SPI_TRANS_CS_KEEP_ACTIVE;
   ret = spi_device_polling_transmit(spi_, &t);  // Transmit!
   assert(ret == ESP_OK);                        // Should have had no issues
-  // DATA_DELAY;
-  while (gpio_get_level(this->miso_pin_) == 0)
-    ;
+  DATA_DELAY;
+  // while (gpio_get_level(this->miso_pin_) == 0)
+  //   ;
 }
 
 void DelumoOutput::send_command_(uint16_t command) {
@@ -269,9 +269,9 @@ void DelumoOutput::send_command_(uint16_t command) {
   ret = spi_device_polling_transmit(this->spi_, &t);  // Transmit!
   assert(ret == ESP_OK);                              // Should have had no issues.
   gpio_set_level(this->cs_pin_, 1);
-  // COMMAND_DELAY;
-  while (gpio_get_level(this->miso_pin_) == 0)
-    ;
+  COMMAND_DELAY;
+  // while (gpio_get_level(this->miso_pin_) == 0)
+  //   ;
 }
 
 // returns 1 if 6 bytes are received
