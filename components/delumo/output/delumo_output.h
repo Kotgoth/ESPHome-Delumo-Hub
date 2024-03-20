@@ -162,13 +162,6 @@ class DelumoOutput : public Component {
   void set_cs_pin(GPIOPin *pin) { cs_pin_ = (gpio_num_t) ((InternalGPIOPin *) pin)->get_pin(); }
   void set_sclk_pin(GPIOPin *pin) { sclk_pin_ = (gpio_num_t) ((InternalGPIOPin *) pin)->get_pin(); }
 
-  // void set_reset_pin(GPIOPin *pin) { reset_pin_ = pin; }
-  // void set_fsel_pin(GPIOPin *pin) { fsel_pin_ = pin; }
-  // void set_mosi_pin(GPIOPin *pin) { mosi_pin_ = pin; }
-  // void set_miso_pin(GPIOPin *pin) { miso_pin_ = pin; }
-  // void set_cs_pin(GPIOPin *pin) { cs_pin_ = pin; }
-  // void set_sclk_pin(GPIOPin *pin) { sclk_pin_ = pin; }
-
  protected:
   void send_package_(uint16_t id, uint16_t serial, uint8_t command);
   void send_data_(uint8_t *data, uint8_t length);
