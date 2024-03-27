@@ -119,7 +119,6 @@
 
 #define DELUMO_ID 0x6520
 // #define READ_ENABLED 1
-// #define USE_FSEL_DATA
 #define USE_MISO_READY 1
 
 #include "esphome/core/component.h"
@@ -186,7 +185,7 @@ class DelumoOutput : public Component {
   gpio_num_t cs_pin_;
   gpio_num_t sclk_pin_;
 
-  int data_rate_ = 200000;
+  int data_rate_ = 2000 * 1000;
   uint8_t mode_ = 0;
   spi_device_handle_t spi_;
 };

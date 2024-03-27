@@ -5,9 +5,6 @@
 namespace esphome {
 namespace delumo {
 
-// uint8_t delumo_command = 0;
-// uint8_t delumo_buffer[6];
-
 gpio_num_t led_pin = GPIO_NUM_2;
 
 volatile bool receive_enabled = true;
@@ -137,17 +134,17 @@ void DelumoOutput::setup() {
   // Initialize the SPI bus
   esp_err_t ret;
   spi_bus_config_t buscfg = {.mosi_io_num = mosi_pin_,  //((InternalGPIOPin *) mosi_pin_)->get_pin(),
-                             .miso_io_num = 19,         //((InternalGPIOPin *) miso_pin_)->get_pin(),
-                             .sclk_io_num = 18,         //((InternalGPIOPin *) sclk_pin_)->get_pin(),
+                             .miso_io_num = miso_pin_,  //((InternalGPIOPin *) miso_pin_)->get_pin(),
+                             .sclk_io_num = sclk_pin_,  //((InternalGPIOPin *) sclk_pin_)->get_pin(),
                              .quadwp_io_num = -1,
                              .quadhd_io_num = -1,
                              .max_transfer_sz = 0};
 
   spi_device_interface_config_t devcfg = {
-      .mode = mode_,              // SPI mode 0
-      .clock_speed_hz = 1000000,  // Clock in Hz
-      .spics_io_num = -1,         // PIN_NUM_CS,               //CS pin
-      .queue_size = 1,            // We want to be able to queue 7 transactions at a time
+      .mode = mode_,                 // SPI mode 0
+      .clock_speed_hz = data_rate_,  // Clock in Hz
+      .spics_io_num = -1,            // PIN_NUM_CS,               //CS pin
+      .queue_size = 1,               // We want to be able to queue 7 transactions at a time
       // .pre_cb = spi_pre_transfer_callback,  // Specify pre-transfer callback to handle D/C line
       // .post_cb = spi_post_transfer_callback,
       //.input_delay_ns = 30,
