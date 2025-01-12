@@ -120,6 +120,7 @@
 #define DELUMO_ID 0x6520
 // #define READ_ENABLED 1
 #define USE_MISO_READY 1
+#define ets_delay_us esp_rom_delay_us
 
 #include "esphome/core/component.h"
 #include "driver/spi_master.h"
@@ -140,7 +141,7 @@ enum SPIMode {
 #ifdef READ_ENABLED
 class DelumoOutput : public PollingComponent {
  public:
-  DelumoOutput() : PollingComponent(2){};
+  DelumoOutput() : PollingComponent(2) {};
   void update() override;
 #else
 class DelumoOutput : public Component {
